@@ -1,0 +1,21 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+.example-spacer {
+  flex: 1 1 auto;
+}
+.example-container {
+  width: 1333px;
+  height: 700px;
+  width: fixed;
+  height: fixed;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.example-sidenav-content {
+  height: 100%;
+  width: 100%;
+  justify-content: center;
+}
+
+.example-sidenav {
+  padding: 20px;
+}

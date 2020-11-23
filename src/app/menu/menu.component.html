@@ -1,0 +1,39 @@
+<div>
+  <mat-toolbar color="primary">
+    <button
+      mat-icon-button
+      class="example-icon"
+      aria-label="Example icon-button with menu icon"
+      type="button"
+      mat-button
+      (click)="drawer.toggle()"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>Sistema de irrigação de solo inteligente para áreas de cultivo</span>
+    <span class="example-spacer"></span>
+    <button
+      mat-icon-button
+      class="example-icon favorite-icon"
+      aria-label="Example icon-button with heart icon"
+    >
+      <mat-icon>favorite</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      class="example-icon"
+      aria-label="Example icon-button with share icon"
+    >
+      <mat-icon>share</mat-icon>
+    </button>
+  </mat-toolbar>
+  <mat-drawer-container class="example-container" autosize>
+    <mat-drawer #drawer class="example-sidenav" mode="side">
+      <mat-nav-list>
+        <a mat-list-item routerLink="/dashboard-iot">Dashboard Iot</a>
+        <a mat-list-item routerLink="/relatorio-iot">Relatório Iot</a>
+      </mat-nav-list>
+    </mat-drawer>
+    <div class="example-sidenav-content"><ng-content></ng-content></div>
+  </mat-drawer-container>
+</div>

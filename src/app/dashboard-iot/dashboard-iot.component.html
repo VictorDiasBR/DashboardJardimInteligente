@@ -1,0 +1,28 @@
+<div
+  (mousemove)="synchronizeTooltips($event)"
+  (touchmove)="synchronizeTooltips($event)"
+  (touchstart)="synchronizeTooltips($event)"
+>
+  <highcharts-chart
+    *ngIf="chartOptions1"
+    style="width: 100%; display: block; height: 220px;"
+    [Highcharts]="Highcharts"
+    [options]="chartOptions1"
+  >
+  </highcharts-chart>
+  <highcharts-chart
+    *ngIf="chartOptions2"
+    style="width: 100%; display: block; height: 220px;"
+    [Highcharts]="Highcharts"
+    [options]="chartOptions2"
+  >
+  </highcharts-chart>
+  <highcharts-chart
+    *ngIf="chartOptions3"
+    style="width: 100%; display: block; height: 220px;"
+    [Highcharts]="Highcharts"
+    [options]="chartOptions3"
+  >
+  </highcharts-chart>
+</div>
+
