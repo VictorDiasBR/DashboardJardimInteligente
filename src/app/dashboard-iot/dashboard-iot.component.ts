@@ -38,6 +38,7 @@ export class DashboardIotComponent implements OnInit {
   umidade: number[] = [];
   ml: number[] = [];
   times: string[] = [];
+  sol:number[]=[]
 
   ngOnInit() {
     this.temp.push(23, 38, 20, 29, 34, 16, 27, 29, 19, 40);
@@ -55,6 +56,7 @@ export class DashboardIotComponent implements OnInit {
       "10:56",
       "10:56"
     );
+    this.sol.push(80, 40, 70, 76, 49, 88, 55, 68, 81, 12);
   }
 
   synchronizeTooltips = (e: any) => {
@@ -243,7 +245,7 @@ export class DashboardIotComponent implements OnInit {
       } as Highcharts.SeriesLineOptions
     ]
   };
-
+  
   chartOptions3: Highcharts.Options = {
     chart: {
       marginLeft: 40, // Keep all charts left aligned
@@ -318,6 +320,83 @@ export class DashboardIotComponent implements OnInit {
       {
         data: this.ml,
         name: "Milimetragem de água "
+      } as Highcharts.SeriesLineOptions
+    ]
+  };
+  chartOptions4: Highcharts.Options = {
+    chart: {
+      marginLeft: 40, // Keep all charts left aligned
+      spacingTop: 20,
+      spacingBottom: 20,
+      className: "chart-sync-a"
+    },
+    title: {
+      text: "Sol",
+      align: "left",
+      margin: 0,
+      x: 30
+    },
+    credits: {
+      enabled: false
+    },
+    legend: {
+      enabled: false
+    },
+    xAxis: {
+      crosshair: true,
+      events: {
+        setExtremes: function (e: any) {
+          var thisChart = (this as Highcharts.Axis).chart;
+
+          if (e.trigger !== "syncExtremes") {
+            // Prevent feedback loop
+            Highcharts.charts.forEach(function (chart) {
+              if (
+                chart !== thisChart &&
+                (chart.options.chart && chart.options.chart.className) ===
+                  (thisChart.options.chart && thisChart.options.chart.className)
+              ) {
+                if (chart.xAxis[0].setExtremes) {
+                  // It is null while updating
+                  chart.xAxis[0].setExtremes(e.min, e.max, true, true, {
+                    trigger: "syncExtremes"
+                  });
+                }
+              }
+            });
+          }
+        }
+      },
+      categories: this.times
+    },
+    yAxis: {
+      title: {
+        text: null
+      }
+    },
+    tooltip: {
+      positioner: function () {
+        return {
+          // right aligned
+          x:
+            (this as Highcharts.Tooltip).chart.chartWidth -
+            (this as any).label.width, // resolve lack of definitions
+          y: 10 // align to title
+        };
+      },
+      borderWidth: 0,
+      backgroundColor: "none",
+      pointFormat: "{point.y} %",
+      headerFormat: "{series.name} ",
+      shadow: true,
+      style: {
+        fontSize: "18px"
+      }
+    },
+    series: [
+      {
+        data: this.sol,
+        name: "sol"
       } as Highcharts.SeriesLineOptions
     ]
   };

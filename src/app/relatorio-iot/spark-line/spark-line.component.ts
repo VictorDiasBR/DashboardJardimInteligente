@@ -9,9 +9,11 @@ export interface Historico {
   hora: string;
   temp: number[];
   umidade: number[];
+  sol: number[];
   ml: number[];
   mediaTemp: number;
   mediaUmid: number;
+  mediaSol: number;
   totalMl: number;
 }
 @Component({
@@ -48,6 +50,8 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
     "temp",
     "mediaUmid",
     "umidade",
+    "mediaSol",
+    "sol",
     "totalMl",
     "ml"
   ];
@@ -57,20 +61,24 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
         data: "22/11/2020",
         hora: "10:56",
         temp: [121, 264, 634, 398, 518],
-        umidade: [80, 40, 70, 76, 49, 88, 55, 68, 81, 12],
-        ml: [2, 400, 40, 45, 120, 380, 60, 100, 45, 800],
+        umidade: [80, 40, 70, 76, 49],
+        sol: [80, 40, 70, 76, 49],
+        ml: [2, 400, 40, 45, 120],
         mediaTemp: 198,
         mediaUmid: 234,
+        mediaSol: 123,
         totalMl: 3400
       },
       {
         data: "22/10/2020",
         hora: "10:56",
         temp: [219, 513, 497, 610, 112],
-        umidade: [80, 40, 70, 76, 49, 88, 55, 68, 81, 12],
+        umidade: [80, 40, 70, 76, 49],
+        sol: [80, 40, 70, 76, 49],
         ml: [2, 400, 40, 45, 120, 380, 60, 100, 45, 800],
         mediaTemp: 200,
         mediaUmid: 400,
+        mediaSol: 123,
         totalMl: 2500
       },
       {
@@ -78,9 +86,11 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
         hora: "10:56",
         temp: [321, 634, 104, 997, 208],
         umidade: [80, 40, 70, 76, 49, 88, 55, 68, 81, 12],
+        sol: [80, 40, 70, 76, 49],
         ml: [2, 400, 40, 45, 120, 380, 60, 100, 45, 800],
         mediaTemp: 400,
         mediaUmid: 200,
+        mediaSol: 123,
         totalMl: 3004
       },
       {
@@ -88,9 +98,11 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
         hora: "10:56",
         temp: [219, 513, 497, 610, 112],
         umidade: [80, 40, 70, 76, 49, 88, 55, 68, 81, 12],
+        sol: [80, 40, 70, 76, 49],
         ml: [2, 400, 40, 45, 120, 380, 60, 100, 45, 800],
         mediaTemp: 323,
         mediaUmid: 50,
+        mediaSol: 123,
         totalMl: 2300
       },
       {
@@ -98,9 +110,11 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
         hora: "10:56",
         temp: [651, 501, 100, 308, 149],
         umidade: [80, 40, 70, 76, 49, 88, 55, 68, 81, 12],
+        sol: [80, 40, 70, 76, 49],
         ml: [2, 400, 40, 45, 120, 380, 60, 100, 45, 800],
         mediaTemp: 30,
         mediaUmid: 45,
+        mediaSol: 123,
         totalMl: 2000
       }
     ];
@@ -122,6 +136,12 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
       element["chartObject2"] = this.returnSparkLineChart(element.ml);
       this.response.push(element);
     });
+
+    data.forEach((element) => {
+      element["chartObject3"] = this.returnSparkLineChart(element.sol);
+      this.response.push(element);
+    });
+
     console.log("1 - " + this.response);
     this.historico = data;
     this.dataSource = new MatTableDataSource<Historico>(data);

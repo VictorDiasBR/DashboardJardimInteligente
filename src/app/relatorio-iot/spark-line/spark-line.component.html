@@ -64,6 +64,26 @@
       ></td>
     </ng-container>
 
+    <ng-container matColumnDef="mediaSol" align="center">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header align="center">
+        Média Sol
+      </th>
+      <td mat-cell *matCellDef="let element" align="center">
+        {{element.mediaSol}}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="sol" align="center">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header align="center">
+        Sol
+      </th>
+      <td
+        mat-cell
+        *matCellDef="let element"
+        [chart]="element.chartObject3"
+      ></td>
+    </ng-container>
+
     <ng-container matColumnDef="totalMl" align="center">
       <th mat-header-cell *matHeaderCellDef mat-sort-header align="center">
         Total Milimetragem

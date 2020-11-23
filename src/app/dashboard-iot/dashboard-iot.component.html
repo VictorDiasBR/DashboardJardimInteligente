@@ -18,6 +18,13 @@
   >
   </highcharts-chart>
   <highcharts-chart
+    *ngIf="chartOptions4"
+    style="width: 100%; display: block; height: 220px;"
+    [Highcharts]="Highcharts"
+    [options]="chartOptions4"
+  >
+  </highcharts-chart>
+  <highcharts-chart
     *ngIf="chartOptions3"
     style="width: 100%; display: block; height: 220px;"
     [Highcharts]="Highcharts"
