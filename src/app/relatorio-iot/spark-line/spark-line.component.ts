@@ -1,12 +1,15 @@
+import { mapToMapExpression } from "@angular/compiler/src/render3/util";
 import { AfterViewInit, Component, ViewChild, OnInit } from "@angular/core";
 import { MatPaginator } from "@angular/material/paginator";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from "@angular/material/table";
 import { Chart } from "angular-highcharts";
+import { isUndefined } from "util";
+import { Dados } from "../../dados/dados.model";
+import { DadosService } from "../../dados/dados.service";
 
 export interface Historico {
   data: string;
-  hora: string;
   temp: number[];
   umidade: number[];
   sol: number[];
@@ -16,6 +19,7 @@ export interface Historico {
   mediaSol: number;
   totalMl: number;
 }
+
 @Component({
   selector: "app-spark-line",
   templateUrl: "./spark-line.component.html",
@@ -23,9 +27,19 @@ export interface Historico {
 })
 export class SparkLineComponent implements AfterViewInit, OnInit {
   public response = [];
-
+  dados: Dados[];
   historico: Historico[] = [];
+
   dataSource: MatTableDataSource<Historico>;
+
+  temp: number[] = [];
+  umidade: number[] = [];
+  ml: number[] = [];
+  sol: number[] = [];
+  mediaTemp: number;
+  mediaUmidade: number;
+  totalMl: number;
+  mediaSol: number;
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -45,7 +59,6 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
   }
   displayedColumns: string[] = [
     "data",
-    "hora",
     "mediaTemp",
     "temp",
     "mediaUmid",
@@ -55,98 +68,129 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
     "totalMl",
     "ml"
   ];
+
+  constructor(private dadosService: DadosService) {}
   ngOnInit() {
-    let data = [
+    this.dadosService.getDados().subscribe((res) => {
+      /*var res: any[] = [
       {
-        data: "22/11/2020",
-        hora: "10:56",
-        temp: [121, 264, 634, 398, 518],
-        umidade: [80, 40, 70, 76, 49],
-        sol: [80, 40, 70, 76, 49],
-        ml: [2, 400, 40, 45, 120],
-        mediaTemp: 198,
-        mediaUmid: 234,
-        mediaSol: 123,
-        totalMl: 3400
+        id: 2,
+        umidade: 20,
+        temp: 30,
+        sol: 50,
+        ml: 20,
+        data: "45343",
+        hora: "254"
       },
       {
-        data: "22/10/2020",
-        hora: "10:56",
-        temp: [219, 513, 497, 610, 112],
-        umidade: [80, 40, 70, 76, 49],
-        sol: [80, 40, 70, 76, 49],
-        ml: [2, 400, 40, 45, 120, 380, 60, 100, 45, 800],
-        mediaTemp: 200,
-        mediaUmid: 400,
-        mediaSol: 123,
-        totalMl: 2500
+        id: 2,
+        umidade: 20,
+        temp: 36,
+        sol: 50,
+        ml: 20,
+        data: "45343",
+        hora: "254"
       },
       {
-        data: "22/11/2020",
-        hora: "10:56",
-        temp: [321, 634, 104, 997, 208],
-        umidade: [80, 40, 70, 76, 49, 88, 55, 68, 81, 12],
-        sol: [80, 40, 70, 76, 49],
-        ml: [2, 400, 40, 45, 120, 380, 60, 100, 45, 800],
-        mediaTemp: 400,
-        mediaUmid: 200,
-        mediaSol: 123,
-        totalMl: 3004
-      },
-      {
-        data: "22/11/2020",
-        hora: "10:56",
-        temp: [219, 513, 497, 610, 112],
-        umidade: [80, 40, 70, 76, 49, 88, 55, 68, 81, 12],
-        sol: [80, 40, 70, 76, 49],
-        ml: [2, 400, 40, 45, 120, 380, 60, 100, 45, 800],
-        mediaTemp: 323,
-        mediaUmid: 50,
-        mediaSol: 123,
-        totalMl: 2300
-      },
-      {
-        data: "22/11/2020",
-        hora: "10:56",
-        temp: [651, 501, 100, 308, 149],
-        umidade: [80, 40, 70, 76, 49, 88, 55, 68, 81, 12],
-        sol: [80, 40, 70, 76, 49],
-        ml: [2, 400, 40, 45, 120, 380, 60, 100, 45, 800],
-        mediaTemp: 30,
-        mediaUmid: 45,
-        mediaSol: 123,
-        totalMl: 2000
+        id: 2,
+        umidade: 20,
+        temp: 40,
+        sol: 50,
+        ml: 20,
+        data: "55343",
+        hora: "254"
       }
     ];
+*/
+      this.dados = res;
 
-    data.forEach((element) => {
-      element["chartObject"] = this.returnSparkLineChart(element.temp);
-      this.response.push(element);
+      var datas = this.dados.map((dados) => dados.data);
+      var datasFiltradas = [];
+
+      datas.forEach((item) => {
+        var duplicated =
+          datasFiltradas.findIndex((redItem) => {
+            return item === redItem;
+          }) > -1;
+
+        if (!duplicated) {
+          datasFiltradas.push(item);
+        }
+      });
+
+      var aux: Historico;
+      var data: Historico[] = [];
+      for (const i of datasFiltradas) {
+        var count: number = 0;
+        var dataIn: string;
+        var temp: number[] = [];
+        var umidade: number[] = [];
+        var ml: number[] = [];
+        var sol: number[] = [];
+        var mediaTemp;
+        var mediaUmidade;
+        var totalMl;
+        var mediaSol;
+
+        for (const j of this.dados) {
+          if (i === j.data) {
+            dataIn = j.data;
+            mediaTemp = mediaTemp + j.temperatura;
+            mediaUmidade = mediaUmidade + j.umidade;
+            mediaSol = mediaSol + j.radiacaoSolar;
+            totalMl = totalMl + j.tempoIrrigacao; //-----------Transformar em ml
+            temp.push(j.temperatura);
+            sol.push(j.radiacaoSolar);
+            umidade.push(j.umidade);
+            ml.push(j.tempoIrrigacao); //-----------Transformar em ml
+            count++;
+          }
+        }
+
+        mediaSol = mediaSol / count;
+        mediaUmidade = mediaUmidade / count;
+        mediaTemp = mediaTemp / count;
+
+        aux = {
+          mediaSol: mediaSol,
+          data: dataIn,
+          temp: temp,
+          umidade: umidade,
+          sol: sol,
+          ml: ml,
+          mediaTemp: mediaTemp,
+          mediaUmid: mediaUmidade,
+          totalMl: totalMl
+        };
+
+        data.push(aux);
+      }
+
+      data.forEach((element) => {
+        element["chartObject"] = this.returnSparkLineChart(element.temp);
+        this.response.push(element);
+      });
+
+      data.forEach((element) => {
+        element["chartObject1"] = this.returnSparkLineChart(element.umidade);
+        this.response.push(element);
+      });
+
+      data.forEach((element) => {
+        element["chartObject2"] = this.returnSparkLineChart(element.ml);
+        this.response.push(element);
+      });
+
+      data.forEach((element) => {
+        element["chartObject3"] = this.returnSparkLineChart(element.sol);
+        this.response.push(element);
+      });
+
+      this.historico = data;
+      this.dataSource = new MatTableDataSource<Historico>(data);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
     });
-
-    console.log("1 - " + this.response);
-
-    data.forEach((element) => {
-      element["chartObject1"] = this.returnSparkLineChart(element.umidade);
-      this.response.push(element);
-    });
-    console.log("1 - " + this.response);
-
-    data.forEach((element) => {
-      element["chartObject2"] = this.returnSparkLineChart(element.ml);
-      this.response.push(element);
-    });
-
-    data.forEach((element) => {
-      element["chartObject3"] = this.returnSparkLineChart(element.sol);
-      this.response.push(element);
-    });
-
-    console.log("1 - " + this.response);
-    this.historico = data;
-    this.dataSource = new MatTableDataSource<Historico>(data);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
   }
 
   returnSparkLineChart(seriesData: any) {

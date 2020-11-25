@@ -63,13 +63,15 @@ import { ChartModule } from "angular-highcharts";
 import { DashboardIotComponent } from "./dashboard-iot/dashboard-iot.component";
 import { RelatorioIotComponent } from "./relatorio-iot/relatorio-iot.component";
 import { SparkLineComponent } from "./relatorio-iot/spark-line/spark-line.component";
+import { DadosComponent } from './dados/dados.component';
 @NgModule({
   declarations: [
     AppComponent,
     MenuComponent,
     DashboardIotComponent,
     RelatorioIotComponent,
-    SparkLineComponent
+    SparkLineComponent,
+    DadosComponent
   ],
   imports: [
     HighchartsChartModule,

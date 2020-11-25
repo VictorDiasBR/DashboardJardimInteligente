@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
-
+import { Dados } from "../dados/dados.model";
+import { DadosService } from "../dados/dados.service";
 import * as Highcharts from "highcharts";
 
 declare module "highcharts" {
@@ -33,32 +34,33 @@ Highcharts.Point.prototype.highlight = function (event) {
 })
 export class DashboardIotComponent implements OnInit {
   Highcharts = Highcharts;
-
+  dados: Dados[] = [];
+  chartOptions1: Highcharts.Options;
+  chartOptions2: Highcharts.Options;
+  chartOptions3: Highcharts.Options;
+  chartOptions4: Highcharts.Options;
   temp: number[] = [];
   umidade: number[] = [];
   ml: number[] = [];
   times: string[] = [];
-  sol:number[]=[]
-
+  sol: number[] = [];
+  constructor(private dadosService: DadosService) {}
   ngOnInit() {
-    this.temp.push(23, 38, 20, 29, 34, 16, 27, 29, 19, 40);
-    this.umidade.push(80, 40, 70, 76, 49, 88, 55, 68, 81, 12);
-    this.ml.push(2, 400, 40, 45, 120, 380, 60, 100, 45, 800);
-    this.times.push(
-      "10:56",
-      "10:56",
-      "10:56",
-      "10:56",
-      "10:56",
-      "10:56",
-      "10:56",
-      "10:56",
-      "10:56",
-      "10:56"
-    );
-    this.sol.push(80, 40, 70, 76, 49, 88, 55, 68, 81, 12);
-  }
+    this.dadosService.getDados().subscribe((res) => {
+      this.dados = res;
+      for (const i of this.dados) {
+        
+          this.temp.push(i.temperatura);
+          this.umidade.push(i.umidade);
+          this.ml.push(i.tempoIrrigacao);///transformr em ml
+          this.times.push(String(i.hora));
+          this.sol.push(i.radiacaoSolar);
+       
+      }
 
+      this.salvar();
+    });
+  }
   synchronizeTooltips = (e: any) => {
     var chart,
       point,
@@ -89,315 +91,320 @@ export class DashboardIotComponent implements OnInit {
       }
     }
   };
+  salvar() {
+    this.chartOptions1 = {
+      chart: {
+        marginLeft: 40, // Keep all charts left aligned
+        spacingTop: 20,
+        spacingBottom: 20,
+        className: "chart-sync-a"
+      },
+      title: {
+        text: "Temperatura Ambiente",
+        align: "left",
+        margin: 0,
+        x: 30
+      },
+      credits: {
+        enabled: false
+      },
+      legend: {
+        enabled: false
+      },
+      xAxis: {
+        crosshair: true,
+        events: {
+          setExtremes: function (e: any) {
+            var thisChart = (this as Highcharts.Axis).chart;
 
-  chartOptions1: Highcharts.Options = {
-    chart: {
-      marginLeft: 40, // Keep all charts left aligned
-      spacingTop: 20,
-      spacingBottom: 20,
-      className: "chart-sync-a"
-    },
-    title: {
-      text: "Temperatura Ambiente",
-      align: "left",
-      margin: 0,
-      x: 30
-    },
-    credits: {
-      enabled: false
-    },
-    legend: {
-      enabled: false
-    },
-    xAxis: {
-      crosshair: true,
-      events: {
-        setExtremes: function (e: any) {
-          var thisChart = (this as Highcharts.Axis).chart;
-
-          if (e.trigger !== "syncExtremes") {
-            // Prevent feedback loop
-            Highcharts.charts.forEach(function (chart) {
-              if (
-                chart !== thisChart &&
-                (chart.options.chart && chart.options.chart.className) ===
-                  (thisChart.options.chart && thisChart.options.chart.className)
-              ) {
-                if (chart.xAxis[0].setExtremes) {
-                  // It is null while updating
-                  chart.xAxis[0].setExtremes(e.min, e.max, true, true, {
-                    trigger: "syncExtremes"
-                  });
+            if (e.trigger !== "syncExtremes") {
+              // Prevent feedback loop
+              Highcharts.charts.forEach(function (chart) {
+                if (
+                  chart !== thisChart &&
+                  (chart.options.chart && chart.options.chart.className) ===
+                    (thisChart.options.chart &&
+                      thisChart.options.chart.className)
+                ) {
+                  if (chart.xAxis[0].setExtremes) {
+                    // It is null while updating
+                    chart.xAxis[0].setExtremes(e.min, e.max, true, true, {
+                      trigger: "syncExtremes"
+                    });
+                  }
                 }
-              }
-            });
+              });
+            }
           }
+        },
+        categories: this.times
+      },
+      yAxis: {
+        title: {
+          text: null
         }
       },
-      categories: this.times
-    },
-    yAxis: {
-      title: {
-        text: null
-      }
-    },
-    tooltip: {
-      positioner: function () {
-        return {
-          // right aligned
-          x:
-            (this as Highcharts.Tooltip).chart.chartWidth -
-            (this as any).label.width, // resolve lack of definitions
-          y: 10 // align to title
-        };
-      },
-      borderWidth: 0,
-      backgroundColor: "none",
-      pointFormat: "{point.y} Cº",
-      headerFormat: "{series.name} ",
-      shadow: true,
-      style: {
-        fontSize: "18px"
-      }
-    },
-    series: [
-      {
-        data: this.temp,
-        name: "Temperatura Ambiente"
-      } as Highcharts.SeriesLineOptions
-    ]
-  };
-
-  chartOptions2: Highcharts.Options = {
-    chart: {
-      marginLeft: 40, // Keep all charts left aligned
-      spacingTop: 20,
-      spacingBottom: 20,
-      className: "chart-sync-a"
-    },
-    title: {
-      text: "Umidade do Solo",
-      align: "left",
-      margin: 0,
-      x: 30
-    },
-    credits: {
-      enabled: false
-    },
-    legend: {
-      enabled: false
-    },
-    xAxis: {
-      crosshair: true,
-      events: {
-        setExtremes: function (e: any) {
-          var thisChart = (this as Highcharts.Axis).chart;
-
-          if (e.trigger !== "syncExtremes") {
-            // Prevent feedback loop
-            Highcharts.charts.forEach(function (chart) {
-              if (
-                chart !== thisChart &&
-                (chart.options.chart && chart.options.chart.className) ===
-                  (thisChart.options.chart && thisChart.options.chart.className)
-              ) {
-                if (chart.xAxis[0].setExtremes) {
-                  // It is null while updating
-                  chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {
-                    trigger: "syncExtremes"
-                  });
-                }
-              }
-            });
-          }
+      tooltip: {
+        positioner: function () {
+          return {
+            // right aligned
+            x:
+              (this as Highcharts.Tooltip).chart.chartWidth -
+              (this as any).label.width, // resolve lack of definitions
+            y: 10 // align to title
+          };
+        },
+        borderWidth: 0,
+        backgroundColor: "none",
+        pointFormat: "{point.y} Cº",
+        headerFormat: "{series.name} ",
+        shadow: true,
+        style: {
+          fontSize: "18px"
         }
       },
-      categories: this.times
-    },
-    yAxis: {
-      title: {
-        text: null
-      }
-    },
-    tooltip: {
-      positioner: function () {
-        return {
-          // right aligned
-          x:
-            (this as Highcharts.Tooltip).chart.chartWidth -
-            (this as any).label.width, // resolve lack of definitions
-          y: 10 // align to title
-        };
-      },
-      borderWidth: 0,
-      backgroundColor: "none",
-      pointFormat: "{point.y} %",
-      headerFormat: "{series.name} ",
-      shadow: true,
-      style: {
-        fontSize: "18px"
-      }
-    },
-    series: [
-      {
-        data: this.umidade,
-        name: "Umidade do Solo "
-      } as Highcharts.SeriesLineOptions
-    ]
-  };
-  
-  chartOptions3: Highcharts.Options = {
-    chart: {
-      marginLeft: 40, // Keep all charts left aligned
-      spacingTop: 20,
-      spacingBottom: 20,
-      className: "chart-sync-a"
-    },
-    title: {
-      text: "Irrigação",
-      align: "left",
-      margin: 0,
-      x: 30
-    },
-    credits: {
-      enabled: false
-    },
-    legend: {
-      enabled: false
-    },
-    xAxis: {
-      crosshair: true,
-      events: {
-        setExtremes: function (e: any) {
-          var thisChart = (this as Highcharts.Axis).chart;
+      series: [
+        {
+          data: this.temp,
+          name: "Temperatura Ambiente"
+        } as Highcharts.SeriesLineOptions
+      ]
+    };
 
-          if (e.trigger !== "syncExtremes") {
-            // Prevent feedback loop
-            Highcharts.charts.forEach(function (chart) {
-              if (
-                chart !== thisChart &&
-                (chart.options.chart && chart.options.chart.className) ===
-                  (thisChart.options.chart && thisChart.options.chart.className)
-              ) {
-                if (chart.xAxis[0].setExtremes) {
-                  // It is null while updating
-                  chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {
-                    trigger: "syncExtremes"
-                  });
+    this.chartOptions2 = {
+      chart: {
+        marginLeft: 40, // Keep all charts left aligned
+        spacingTop: 20,
+        spacingBottom: 20,
+        className: "chart-sync-a"
+      },
+      title: {
+        text: "Umidade do Solo",
+        align: "left",
+        margin: 0,
+        x: 30
+      },
+      credits: {
+        enabled: false
+      },
+      legend: {
+        enabled: false
+      },
+      xAxis: {
+        crosshair: true,
+        events: {
+          setExtremes: function (e: any) {
+            var thisChart = (this as Highcharts.Axis).chart;
+
+            if (e.trigger !== "syncExtremes") {
+              // Prevent feedback loop
+              Highcharts.charts.forEach(function (chart) {
+                if (
+                  chart !== thisChart &&
+                  (chart.options.chart && chart.options.chart.className) ===
+                    (thisChart.options.chart &&
+                      thisChart.options.chart.className)
+                ) {
+                  if (chart.xAxis[0].setExtremes) {
+                    // It is null while updating
+                    chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {
+                      trigger: "syncExtremes"
+                    });
+                  }
                 }
-              }
-            });
+              });
+            }
           }
+        },
+        categories: this.times
+      },
+      yAxis: {
+        title: {
+          text: null
         }
       },
-      categories: this.times
-    },
-    yAxis: {
-      title: {
-        text: null
-      }
-    },
-    tooltip: {
-      positioner: function () {
-        return {
-          // right aligned
-          x:
-            (this as Highcharts.Tooltip).chart.chartWidth -
-            (this as any).label.width, // resolve lack of definitions
-          y: 10 // align to title
-        };
-      },
-      borderWidth: 0,
-      backgroundColor: "none",
-      pointFormat: "{point.y} ml",
-      headerFormat: "{series.name} ",
-      shadow: true,
-      style: {
-        fontSize: "18px"
-      }
-    },
-    series: [
-      {
-        data: this.ml,
-        name: "Milimetragem de água "
-      } as Highcharts.SeriesLineOptions
-    ]
-  };
-  chartOptions4: Highcharts.Options = {
-    chart: {
-      marginLeft: 40, // Keep all charts left aligned
-      spacingTop: 20,
-      spacingBottom: 20,
-      className: "chart-sync-a"
-    },
-    title: {
-      text: "Sol",
-      align: "left",
-      margin: 0,
-      x: 30
-    },
-    credits: {
-      enabled: false
-    },
-    legend: {
-      enabled: false
-    },
-    xAxis: {
-      crosshair: true,
-      events: {
-        setExtremes: function (e: any) {
-          var thisChart = (this as Highcharts.Axis).chart;
-
-          if (e.trigger !== "syncExtremes") {
-            // Prevent feedback loop
-            Highcharts.charts.forEach(function (chart) {
-              if (
-                chart !== thisChart &&
-                (chart.options.chart && chart.options.chart.className) ===
-                  (thisChart.options.chart && thisChart.options.chart.className)
-              ) {
-                if (chart.xAxis[0].setExtremes) {
-                  // It is null while updating
-                  chart.xAxis[0].setExtremes(e.min, e.max, true, true, {
-                    trigger: "syncExtremes"
-                  });
-                }
-              }
-            });
-          }
+      tooltip: {
+        positioner: function () {
+          return {
+            // right aligned
+            x:
+              (this as Highcharts.Tooltip).chart.chartWidth -
+              (this as any).label.width, // resolve lack of definitions
+            y: 10 // align to title
+          };
+        },
+        borderWidth: 0,
+        backgroundColor: "none",
+        pointFormat: "{point.y} %",
+        headerFormat: "{series.name} ",
+        shadow: true,
+        style: {
+          fontSize: "18px"
         }
       },
-      categories: this.times
-    },
-    yAxis: {
-      title: {
-        text: null
-      }
-    },
-    tooltip: {
-      positioner: function () {
-        return {
-          // right aligned
-          x:
-            (this as Highcharts.Tooltip).chart.chartWidth -
-            (this as any).label.width, // resolve lack of definitions
-          y: 10 // align to title
-        };
+      series: [
+        {
+          data: this.umidade,
+          name: "Umidade do Solo "
+        } as Highcharts.SeriesLineOptions
+      ]
+    };
+
+    this.chartOptions3 = {
+      chart: {
+        marginLeft: 40, // Keep all charts left aligned
+        spacingTop: 20,
+        spacingBottom: 20,
+        className: "chart-sync-a"
       },
-      borderWidth: 0,
-      backgroundColor: "none",
-      pointFormat: "{point.y} %",
-      headerFormat: "{series.name} ",
-      shadow: true,
-      style: {
-        fontSize: "18px"
-      }
-    },
-    series: [
-      {
-        data: this.sol,
-        name: "sol"
-      } as Highcharts.SeriesLineOptions
-    ]
-  };
+      title: {
+        text: "Irrigação",
+        align: "left",
+        margin: 0,
+        x: 30
+      },
+      credits: {
+        enabled: false
+      },
+      legend: {
+        enabled: false
+      },
+      xAxis: {
+        crosshair: true,
+        events: {
+          setExtremes: function (e: any) {
+            var thisChart = (this as Highcharts.Axis).chart;
+
+            if (e.trigger !== "syncExtremes") {
+              // Prevent feedback loop
+              Highcharts.charts.forEach(function (chart) {
+                if (
+                  chart !== thisChart &&
+                  (chart.options.chart && chart.options.chart.className) ===
+                    (thisChart.options.chart &&
+                      thisChart.options.chart.className)
+                ) {
+                  if (chart.xAxis[0].setExtremes) {
+                    // It is null while updating
+                    chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {
+                      trigger: "syncExtremes"
+                    });
+                  }
+                }
+              });
+            }
+          }
+        },
+        categories: this.times
+      },
+      yAxis: {
+        title: {
+          text: null
+        }
+      },
+      tooltip: {
+        positioner: function () {
+          return {
+            // right aligned
+            x:
+              (this as Highcharts.Tooltip).chart.chartWidth -
+              (this as any).label.width, // resolve lack of definitions
+            y: 10 // align to title
+          };
+        },
+        borderWidth: 0,
+        backgroundColor: "none",
+        pointFormat: "{point.y} ml",
+        headerFormat: "{series.name} ",
+        shadow: true,
+        style: {
+          fontSize: "18px"
+        }
+      },
+      series: [
+        {
+          data: this.ml,
+          name: "Milimetragem de água "
+        } as Highcharts.SeriesLineOptions
+      ]
+    };
+    this.chartOptions4 = {
+      chart: {
+        marginLeft: 40, // Keep all charts left aligned
+        spacingTop: 20,
+        spacingBottom: 20,
+        className: "chart-sync-a"
+      },
+      title: {
+        text: "Sol",
+        align: "left",
+        margin: 0,
+        x: 30
+      },
+      credits: {
+        enabled: false
+      },
+      legend: {
+        enabled: false
+      },
+      xAxis: {
+        crosshair: true,
+        events: {
+          setExtremes: function (e: any) {
+            var thisChart = (this as Highcharts.Axis).chart;
+
+            if (e.trigger !== "syncExtremes") {
+              // Prevent feedback loop
+              Highcharts.charts.forEach(function (chart) {
+                if (
+                  chart !== thisChart &&
+                  (chart.options.chart && chart.options.chart.className) ===
+                    (thisChart.options.chart &&
+                      thisChart.options.chart.className)
+                ) {
+                  if (chart.xAxis[0].setExtremes) {
+                    // It is null while updating
+                    chart.xAxis[0].setExtremes(e.min, e.max, true, true, {
+                      trigger: "syncExtremes"
+                    });
+                  }
+                }
+              });
+            }
+          }
+        },
+        categories: this.times
+      },
+      yAxis: {
+        title: {
+          text: null
+        }
+      },
+      tooltip: {
+        positioner: function () {
+          return {
+            // right aligned
+            x:
+              (this as Highcharts.Tooltip).chart.chartWidth -
+              (this as any).label.width, // resolve lack of definitions
+            y: 10 // align to title
+          };
+        },
+        borderWidth: 0,
+        backgroundColor: "none",
+        pointFormat: "{point.y} %",
+        headerFormat: "{series.name} ",
+        shadow: true,
+        style: {
+          fontSize: "18px"
+        }
+      },
+      series: [
+        {
+          data: this.sol,
+          name: "sol"
+        } as Highcharts.SeriesLineOptions
+      ]
+    };
+  }
 }
