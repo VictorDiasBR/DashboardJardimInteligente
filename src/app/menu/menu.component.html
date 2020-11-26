@@ -29,9 +29,16 @@
   </mat-toolbar>
   <mat-drawer-container class="example-container" autosize>
     <mat-drawer #drawer class="example-sidenav" mode="side">
-      <mat-nav-list>
-        <a mat-list-item routerLink="/dashboard-iot">Dashboard Iot</a>
-        <a mat-list-item routerLink="/relatorio-iot">Relatório Iot</a>
+      <mat-nav-list style="align-content: center;">
+        <a mat-list-item routerLink="/dashboard-iot" style="text-align: center;"
+          >Dashboard Iot</a
+        >
+        <a mat-list-item routerLink="/relatorio-iot" style="text-align: center;"
+          >Índices Diários</a
+        >
+        <a mat-list-item routerLink="/historico" style="text-align: center;"
+          >Histórico de <br />Irrigações</a
+        >
       </mat-nav-list>
     </mat-drawer>
     <div class="example-sidenav-content"><ng-content></ng-content></div>

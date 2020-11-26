@@ -44,18 +44,18 @@ export class DashboardIotComponent implements OnInit {
   ml: number[] = [];
   times: string[] = [];
   sol: number[] = [];
+
   constructor(private dadosService: DadosService) {}
   ngOnInit() {
+    let vazao = 5; // vazao da agua 5 ml/s
     this.dadosService.getDados().subscribe((res) => {
       this.dados = res;
       for (const i of this.dados) {
-        
-          this.temp.push(i.temperatura);
-          this.umidade.push(i.umidade);
-          this.ml.push(i.tempoIrrigacao);///transformr em ml
-          this.times.push(String(i.hora));
-          this.sol.push(i.radiacaoSolar);
-       
+        this.temp.push(i.temperatura);
+        this.umidade.push(i.umidade);
+        this.ml.push(i.tempoIrrigacao * vazao); ///transformr em ml V = vazao x ΔT
+        this.times.push(String(i.hora));
+        this.sol.push(i.radiacaoSolar);
       }
 
       this.salvar();
@@ -336,7 +336,7 @@ export class DashboardIotComponent implements OnInit {
         className: "chart-sync-a"
       },
       title: {
-        text: "Sol",
+        text: "Radiação Solar",
         align: "left",
         margin: 0,
         x: 30
@@ -402,7 +402,7 @@ export class DashboardIotComponent implements OnInit {
       series: [
         {
           data: this.sol,
-          name: "sol"
+          name: "Radiação Solar"
         } as Highcharts.SeriesLineOptions
       ]
     };

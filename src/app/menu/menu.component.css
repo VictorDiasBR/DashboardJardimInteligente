@@ -10,6 +10,9 @@
   border: 1px solid rgba(0, 0, 0, 0.5);
 }
 
+mat-list-item {
+  text-align: justify-content;
+}
 .example-sidenav-content {
   height: 100%;
   width: 100%;

@@ -72,36 +72,6 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
   constructor(private dadosService: DadosService) {}
   ngOnInit() {
     this.dadosService.getDados().subscribe((res) => {
-      /*var res: any[] = [
-      {
-        id: 2,
-        umidade: 20,
-        temp: 30,
-        sol: 50,
-        ml: 20,
-        data: "45343",
-        hora: "254"
-      },
-      {
-        id: 2,
-        umidade: 20,
-        temp: 36,
-        sol: 50,
-        ml: 20,
-        data: "45343",
-        hora: "254"
-      },
-      {
-        id: 2,
-        umidade: 20,
-        temp: 40,
-        sol: 50,
-        ml: 20,
-        data: "55343",
-        hora: "254"
-      }
-    ];
-*/
       this.dados = res;
 
       var datas = this.dados.map((dados) => dados.data);
@@ -118,8 +88,10 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
         }
       });
 
+      let vazao = 5; // 5 ml/s
       var aux: Historico;
       var data: Historico[] = [];
+
       for (const i of datasFiltradas) {
         var count: number = 0;
         var dataIn: string;
@@ -127,10 +99,10 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
         var umidade: number[] = [];
         var ml: number[] = [];
         var sol: number[] = [];
-        var mediaTemp;
-        var mediaUmidade;
-        var totalMl;
-        var mediaSol;
+        let mediaTemp = 0;
+        let mediaUmidade = 0;
+        let totalMl = 0;
+        let mediaSol = 0;
 
         for (const j of this.dados) {
           if (i === j.data) {
@@ -142,7 +114,7 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
             temp.push(j.temperatura);
             sol.push(j.radiacaoSolar);
             umidade.push(j.umidade);
-            ml.push(j.tempoIrrigacao); //-----------Transformar em ml
+            ml.push(j.tempoIrrigacao * vazao); //-----------Transformar em ml
             count++;
           }
         }
@@ -151,6 +123,7 @@ export class SparkLineComponent implements AfterViewInit, OnInit {
         mediaUmidade = mediaUmidade / count;
         mediaTemp = mediaTemp / count;
 
+        totalMl = totalMl * vazao; // V(volume de água) = vazao x ΔT
         aux = {
           mediaSol: mediaSol,
           data: dataIn,
