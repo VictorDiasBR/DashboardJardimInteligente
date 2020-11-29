@@ -11,3 +11,10 @@ td,
 th {
   width: 0%;
 }
+
+mat-spinner {
+  width: 300px;
+  height: 300px;
+  margin-top: 250px;
+  margin-left: 580px;
+}

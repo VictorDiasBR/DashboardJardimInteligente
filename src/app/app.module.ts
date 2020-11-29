@@ -63,8 +63,8 @@ import { ChartModule } from "angular-highcharts";
 import { DashboardIotComponent } from "./dashboard-iot/dashboard-iot.component";
 import { RelatorioIotComponent } from "./relatorio-iot/relatorio-iot.component";
 import { SparkLineComponent } from "./relatorio-iot/spark-line/spark-line.component";
-import { DadosComponent } from './dados/dados.component';
-import { HistoricoComponent } from './historico/historico.component';
+import { DadosComponent } from "./dados/dados.component";
+import { HistoricoComponent } from "./historico/historico.component";
 @NgModule({
   declarations: [
     AppComponent,
@@ -124,7 +124,6 @@ import { HistoricoComponent } from './historico/historico.component';
     MatTreeModule,
     PortalModule,
     ScrollingModule,
-
     FormsModule,
     HttpClientModule,
     MatNativeDateModule,

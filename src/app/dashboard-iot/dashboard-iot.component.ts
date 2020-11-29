@@ -1,4 +1,9 @@
-import { Component, OnInit } from "@angular/core";
+import {
+  ChangeDetectorRef,
+  ChangeDetectionStrategy,
+  Component,
+  OnInit
+} from "@angular/core";
 import { Dados } from "../dados/dados.model";
 import { DadosService } from "../dados/dados.service";
 import * as Highcharts from "highcharts";
@@ -30,7 +35,8 @@ Highcharts.Point.prototype.highlight = function (event) {
 @Component({
   selector: "app-dashboard-iot",
   templateUrl: "./dashboard-iot.component.html",
-  styleUrls: ["./dashboard-iot.component.css"]
+  styleUrls: ["./dashboard-iot.component.css"],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DashboardIotComponent implements OnInit {
   Highcharts = Highcharts;
@@ -45,7 +51,33 @@ export class DashboardIotComponent implements OnInit {
   times: string[] = [];
   sol: number[] = [];
 
-  constructor(private dadosService: DadosService) {}
+  mode = true;
+
+  constructor(
+    private dadosService: DadosService,
+    private ref: ChangeDetectorRef
+  ) {
+    setInterval(() => {
+      let vazao = 5; // vazao da agua 5 ml/s
+      this.dadosService.getDados().subscribe((res) => {
+        for (const i of res) {
+          let achou = this.dados.filter((res) => res.id === i.id);
+
+          if (achou.length === 0) {
+            console.log("Novo elemento adicionado na api: " + i.id);
+            this.temp.push(i.temperatura);
+            this.umidade.push(i.umidade);
+            this.ml.push(i.tempoIrrigacao * vazao); ///transformr em ml V = vazao x ΔT
+            this.times.push(String(i.hora));
+            this.sol.push(i.radiacaoSolar);
+            this.dados.push(i);
+            this.salvar();
+          }
+        }
+        this.ref.markForCheck();
+      });
+    }, 1000);
+  }
   ngOnInit() {
     let vazao = 5; // vazao da agua 5 ml/s
     this.dadosService.getDados().subscribe((res) => {
@@ -59,6 +91,7 @@ export class DashboardIotComponent implements OnInit {
       }
 
       this.salvar();
+      this.mode = false;
     });
   }
   synchronizeTooltips = (e: any) => {

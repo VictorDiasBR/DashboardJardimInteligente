@@ -1,3 +1,4 @@
+<mat-spinner *ngIf="mode"></mat-spinner>
 <mat-form-field>
   <mat-label>Filter</mat-label>
   <input
@@ -7,6 +8,7 @@
     #input
   />
 </mat-form-field>
+
 <div class="mat-elevation-z8">
   <table
     mat-table
@@ -15,6 +17,7 @@
     class="mat-elevation-z8"
     align="center"
   >
+    
     <!-- Position Column -->
     <ng-container matColumnDef="data">
       <th

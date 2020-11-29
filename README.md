@@ -135,7 +135,8 @@ exemplo works!
 
 ---
 
-O html do componente "exemplo", que se encontra no arquivo app/exemplo/exemplo.component.html, foi exibido na página através da tag; 
+O html do componente "exemplo", que se encontra no arquivo app/exemplo/exemplo.component.html, foi exibido na página através da tag;
+
 ```
 <router-outlet></router-outlet>
 ```
