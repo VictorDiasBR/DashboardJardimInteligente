@@ -80,7 +80,7 @@ export class SparkLineComponent
     "totalMl",
     "ml"
   ];
- mode=true;
+  mode = true;
   constructor(
     private dadosService: DadosService,
     private cdref: ChangeDetectorRef
@@ -158,17 +158,21 @@ export class SparkLineComponent
       mediaUmidade = mediaUmidade / count;
       mediaTemp = mediaTemp / count;
 
+      var mediaS = mediaSol.toFixed(1);
+      var mediaU = mediaUmidade.toFixed(1);
+      var mediaT = mediaTemp.toFixed(1);
+
       totalMl = totalMl * vazao; // V(volume de água) = vazao x ΔT
-     
+
       aux = {
-        mediaSol: mediaSol,
+        mediaSol: Number(mediaS),
         data: dataIn,
         temp: temp,
         umidade: umidade,
         sol: sol,
         ml: ml,
-        mediaTemp: mediaTemp,
-        mediaUmid: mediaUmidade,
+        mediaTemp: Number(mediaT),
+        mediaUmid: Number(mediaU),
         totalMl: totalMl
       };
 
@@ -199,7 +203,7 @@ export class SparkLineComponent
     this.dataSource = new MatTableDataSource<Historico>(data);
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
-    this.mode=false;
+    this.mode = false;
   }
   returnSparkLineChart(seriesData: any) {
     return new Chart(<any>{

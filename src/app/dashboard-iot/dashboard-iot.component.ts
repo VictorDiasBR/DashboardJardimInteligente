@@ -13,7 +13,6 @@ declare module "highcharts" {
     highlight: (event: Highcharts.PointerEventObject) => void;
   }
 }
-
 /**
  * Override the reset function, we don't need to hide the tooltips and
  * crosshairs.
@@ -89,7 +88,7 @@ export class DashboardIotComponent implements OnInit {
         this.times.push(String(i.hora));
         this.sol.push(i.radiacaoSolar);
       }
-
+       
       this.salvar();
       this.mode = false;
     });
